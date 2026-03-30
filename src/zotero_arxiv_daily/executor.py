@@ -43,8 +43,11 @@ class Executor:
         zot = zotero.Zotero(self.config.zotero.user_id, 'user', self.config.zotero.api_key)
         collections = zot.everything(zot.collections())
         collections = {c['key']:c for c in collections}
-        corpus = zot.everything(zot.items(itemType='conferencePaper || journalArticle || preprint'))
-        #corpus = [c for c in corpus if c['data']['abstractNote'] != '']
+        all_items = zot.everything(zot.items())
+        #接受的种类
+        allowed_types = ['conferencePaper', 'journalArticle', 'preprint', 'webpage']
+        corpus = [c for c in all_items if c['data'].get('itemType') in allowed_types]
+        corpus = [c for c in corpus if c['data']['abstractNote'] != '']
         def get_collection_path(col_key:str) -> str:
             if p := collections[col_key]['data']['parentCollection']:
                 return get_collection_path(p) + '/' + collections[col_key]['data']['name']
